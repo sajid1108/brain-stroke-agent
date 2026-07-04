@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ModelPrediction(BaseModel):
@@ -18,6 +18,8 @@ class ConsensusResult(BaseModel):
 
 
 class DiagnosisReport(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     primary_diagnosis: str
     confidence: str
     decision_method: str
