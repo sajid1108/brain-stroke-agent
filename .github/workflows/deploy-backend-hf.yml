@@ -1,0 +1,46 @@
+name: Deploy Backend to Hugging Face Spaces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend-hf.yml"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Push backend/ to the Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_REPO: ${{ secrets.HF_SPACE_REPO }} # e.g. your-username/brain-stroke-agent
+        run: |
+          set -e
+          git lfs install
+          git config --global user.email "ci@github-actions"
+          git config --global user.name "GitHub Actions"
+
+          rm -rf /tmp/hf-space
+          git clone "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" /tmp/hf-space
+
+          # Sync backend/ contents into the Space repo root (Docker Space expects
+          # Dockerfile + app code at the repo root, plus a README.md with SDK metadata).
+          rsync -a --delete --exclude='.git' backend/ /tmp/hf-space/
+          cp backend/README_SPACE.md /tmp/hf-space/README.md
+
+          cd /tmp/hf-space
+          git lfs track "*.pth"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to deploy."
+          else
+            git commit -m "Deploy from GitHub: ${{ github.sha }}"
+            git push
+          fi
