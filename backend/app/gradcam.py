@@ -14,7 +14,7 @@ def generate_gradcam(model, img_tensor, target_layer):
     hooks = {"acts": [], "grads": []}
 
     fh = target_layer.register_forward_hook(lambda m, i, o: hooks["acts"].append(o))
-    bh = target_layer.register_full_backward_hook(lambda m, gi, go: hooks["grads"].append(go[0]))
+    bh = target_layer.register_backward_hook(lambda m, gi, go: hooks["grads"].append(go[0]))
 
     output = model(img_tensor)
     probs = F.softmax(output, dim=1)[0]
