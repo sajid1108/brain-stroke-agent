@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-body: "Inter", ui-sans-serif, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+body {
+  background-color: #0a0e12;
+  color: #e7edf2;
+}
+
+/* Corner-bracket scan viewport -- the signature element. Radiology reading rooms are kept
+   dim so the eye keeps its dynamic range for grayscale CT contrast; the dark console theme
+   mirrors that real constraint rather than being decoration. */
+.scan-frame {
+  position: relative;
+  border: 1px solid #232c36;
+}
+.scan-frame::before,
+.scan-frame::after,
+.scan-frame > .corner-tl,
+.scan-frame > .corner-br {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: #35d0c4;
+  transition: border-color 0.2s ease;
+}
+.scan-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid #35d0c4;
+  border-left: 2px solid #35d0c4;
+}
+.scan-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid #35d0c4;
+  border-right: 2px solid #35d0c4;
+}
+
+.scan-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #35d0c4 50%, transparent);
+  box-shadow: 0 0 12px 2px rgba(53, 208, 196, 0.6);
+  animation: sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0% {
+    top: 4%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 94%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-sweep {
+    animation: none;
+    display: none;
+  }
+}
